@@ -1,0 +1,41 @@
+#!/bin/bash
+pin=1
+
+sleep_time="$(cat config 2>&1 | grep TIME_PAUSE_S | cut -d ":" -f 2)"
+after_pir="$(cat config 2>&1 | grep TIME_AFTER_PIR | cut -d ":" -f 2)"
+video="$(cat config 2>&1 | grep VIDEO | cut -d ":" -f 2)"
+echo OUR $video
+
+echo $sleep_time
+echo $after_pir
+
+dir=/home/pi/Videos/inputfiles
+
+file="$( ls $dir)"
+
+seconds="$(omxplayer -i $video 2>&1 | grep Duration | cut -d ' ' -f 4 | sed s/,// | cut -d ':' -f 3 )"
+secs="$(python -c "print $seconds-0.5")"
+echo $secs $seconds
+#echo $dir/$file
+printf s >> $dir/$file
+sleep 0.2
+printf p >> $dir/$file
+gpio -g mode $pin in
+while true
+do
+    if [ "$(gpio read $pin)" == "1" ]
+    then
+	echo HUMAN HERE
+	sleep $after_pir
+	echo PIR DELAY END
+	printf s >> $dir/$file  #video on
+	sleep $secs
+	echo VIDEO_END $secs
+	printf p >> $dir/$file
+	sleep $sleep_time
+	echo SLEEP END
+	printf - >> $dir/$file
+    
+fi
+    sleep 0.05
+done

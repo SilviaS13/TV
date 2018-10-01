@@ -1,0 +1,23 @@
+#!/bin/bash 
+video="$(cat config | grep VIDEO | cut -f 2 -d ':')"
+alpha="$(cat config | grep ALPHA | cut -f 2 -d ':')"
+echo $video
+dir=/home/pi/Videos/inputfiles
+viddir=/home/pi/Videos
+
+while true
+do
+    rm /home/pi/Videos/inputfiles/*
+    file="$(date "+%Y%m%d_%H%M%S" )"
+    touch $dir/$file
+    #ls $dir
+    /home/pi/Videos/tv2 &
+    
+    pid="$(ps -aux | grep -m 1 tv2 | cut -d ' ' -f 8)"  # ps -aux | grep -m 1 tv2 | cut -d ' ' -f 8 )"
+
+    #echo $pid
+    #sleep 5
+    printf p >> $dir/$file
+    omxplayer --alpha $alpha --key-config=keyconfig --no-osd $viddir/$video < $dir/$file
+    kill $pid
+done

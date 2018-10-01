@@ -1,0 +1,7 @@
+TIME_PAUSE_S:1
+TIME_AFTER_PIR:0
+VIDEO:vid.mp4
+
+
+#development_settings - don`t touch
+ALPHA:200
